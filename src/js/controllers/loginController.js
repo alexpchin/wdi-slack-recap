@@ -5,7 +5,7 @@
     .module("slackRecap")
     .controller("LoginController", LoginCtrl);
 
-  function SlackCtrl(){
+  function LoginCtrl(){
     var vm  = this;
     return vm;
   }

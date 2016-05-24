@@ -16,9 +16,9 @@
         controllerAs: "slack"
       })
       .state("login", {
-        url:          "/",
+        url:          "/login",
         templateUrl:  "/html/login.html",
-        controller:   "loginController",
+        controller:   "LoginController",
         controllerAs: "login"
       });
       $urlRouterProvider.otherwise("/");

@@ -48417,9 +48417,9 @@ angular.module('ui.router.state')
         controllerAs: "slack"
       })
       .state("login", {
-        url:          "/",
+        url:          "/login",
         templateUrl:  "/html/login.html",
-        controller:   "loginController",
+        controller:   "LoginController",
         controllerAs: "login"
       });
       $urlRouterProvider.otherwise("/");
@@ -48434,7 +48434,7 @@ angular.module('ui.router.state')
     .module("slackRecap")
     .controller("LoginController", LoginCtrl);
 
-  function SlackCtrl(){
+  function LoginCtrl(){
     var vm  = this;
     return vm;
   }
