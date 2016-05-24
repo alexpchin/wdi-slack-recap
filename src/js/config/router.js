@@ -14,6 +14,12 @@
         templateUrl:  "/html/slack.html",
         controller:   "SlackController",
         controllerAs: "slack"
+      })
+      .state("login", {
+        url:          "/",
+        templateUrl:  "/html/login.html",
+        controller:   "loginController",
+        controllerAs: "login"
       });
       $urlRouterProvider.otherwise("/");
     }

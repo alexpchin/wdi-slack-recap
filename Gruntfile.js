@@ -21,7 +21,6 @@ module.exports = function(grunt) {
         },
         dependencies: {
           bootstrap: [
-            "tether",
             "jquery"
           ]
         }
