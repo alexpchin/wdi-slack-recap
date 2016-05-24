@@ -20,7 +20,10 @@ module.exports = function(grunt) {
           ]
         },
         dependencies: {
-          bootstrap: ["jquery"]
+          bootstrap: [
+            "tether",
+            "jquery"
+          ]
         }
       },
     },
@@ -36,7 +39,11 @@ module.exports = function(grunt) {
     },
     concat: {
       dist: {
-        src: ['src/js/app.js', 'src/js/**/*.js'],
+        src: [
+          'src/js/_bower.js',
+          'src/js/app.js',
+          'src/js/**/*.js'
+        ],
         dest: 'build/js/app.js'
       }
     },
@@ -82,7 +89,7 @@ module.exports = function(grunt) {
           {
             expand: true,
             flatten: true,
-            src: ['src/index.html'],
+            src: ['build/index.html'],
             dest: "build/"
           }
         ]
@@ -105,7 +112,7 @@ module.exports = function(grunt) {
           {
             expand: true,
             flatten: true,
-            src: ['src/index.html'],
+            src: ['build/index.html'],
             dest: "build/"
           }
         ]

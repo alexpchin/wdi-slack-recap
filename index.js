@@ -3,8 +3,10 @@ var app         = express();
 
 var config      = require("./config/config");
 
+app.use("/", express.static("build")); 
+
 app.get("/*", function(req, res){
-  res.sendFile(__dirname + "/public/index.html");
+  res.sendFile(__dirname + "/build/index.html");
 });
 
 app.listen(config.port, function(){
