@@ -1,0 +1,24 @@
+{
+  "name": "wdi-slack-recap",
+  "description": "Generate Slack channel recaps.",
+  "main": "index.js",
+  "authors": [
+    "alexpchin <alex@alexchin.co.uk>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/alexpchin/wdi-slack-recap",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.5.5",
+    "angular-ui-router": "~0.3.0",
+    "angular-resource": "~1.5.5",
+    "bootstrap": "v4.0.0-alpha.2"
+  }
+}
