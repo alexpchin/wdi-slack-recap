@@ -12,7 +12,7 @@
 
     if ($location.search().code) {
       var data = $stateParams;
-      data.client_id     =  SLACK_ID;
+      data.client_id     = SLACK_ID;
       data.client_secret = SLACK_SECRET;
       data.code          = $location.search().code;
       data.redirect_uri  = API + "/";

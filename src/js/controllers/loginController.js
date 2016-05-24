@@ -18,6 +18,9 @@
 
     vm.slackLoginUrl = serializeObject("https://slack.com/oauth/authorize", data);
 
+
+
+
     function serializeObject(url, obj){
       for (var key in obj) {
         if (url.indexOf("?") < 0) {
