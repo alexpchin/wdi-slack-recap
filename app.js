@@ -48441,15 +48441,6 @@ angular.module('ui.router.state')
 
   angular
     .module("slackRecap")
-    .constant("SLACK_CHANNEL", "G0KGN3D96");
-
-})();
-
-(function(){
-  "use strict";
-
-  angular
-    .module("slackRecap")
     .constant("SLACK_ID", "3171645816.45384862630");
 
 })();
@@ -48459,7 +48450,7 @@ angular.module('ui.router.state')
 
   angular
     .module("slackRecap")
-    .constant("SLACK_SECRET", "85b47ace0022e2ab1fa904dfa8693106");
+    .constant("SLACK_SECRET", "SLACK_CLIENT_SECRET");
 
 })();
 
@@ -48508,56 +48499,27 @@ angular.module('ui.router.state')
     .module("slackRecap")
     .controller("SlackController", SlackCtrl);
 
-  SlackCtrl.$inject = ["$stateParams", "$location", "$http", "SLACK_ID", "SLACK_SECRET", "API", "SLACK_CHANNEL"];
-  function SlackCtrl($stateParams, $location, $http, SLACK_ID, SLACK_SECRET, API, SLACK_CHANNEL){
+  SlackCtrl.$inject = ["$stateParams", "$location", "$http", "SLACK_SECRET"];
+  function SlackCtrl($stateParams, $location, $http, SLACK_SECRET){
     var vm   = this;
     vm.name  = "Home";
 
     if ($location.search().code) {
-      var data = $stateParams;
-      data.client_id     =  SLACK_ID;
-      data.client_secret = SLACK_SECRET;
-      data.code          = $location.search().code;
-      data.redirect_uri  = API + "/";
-      oauthAccess(serializeObject("http://slack.com/api/oauth.access", data));
-    }
-
-    function oauthAccess(url){
-      $http({
-        method: "GET",
-        url: url
-      }).then(function(response){
-        console.log("oauthAccess", response);
-        getGroupHistory(response.data.access_token);
-      });
-    }
-
-    function getGroupHistory(token){
       var data = {
-        token: token,
-        channel: SLACK_CHANNEL,
-        pretty: 1,
-        count: 1000
+        client_id: SLACK_SECRET
       };
+      console.log(data);
+      oauthAccess($stateParams);
+    }
 
+    function oauthAccess(data){
       $http({
         method: "GET",
-        url: serializeObject("https://slack.com/api/groups.history", data)
+        url: "http://slack.com/api/oauth.access",
+        data: data
       }).then(function(response){
         console.log(response);
       });
-    }
-
-    function serializeObject(url, obj){
-      for (var key in obj) {
-        if (url.indexOf("?") < 0) {
-          url += "?";
-        } else if (url !== "") {
-          url += "&";
-        }
-        url += key + "=" + encodeURIComponent(obj[key]);
-      }
-      return url;
     }
 
     return vm;
