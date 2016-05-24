@@ -5,8 +5,8 @@
     .module("slackRecap")
     .controller("LoginController", LoginCtrl);
 
-  LoginCtrl.$inject = ["API", "SLACK_ID"];
-  function LoginCtrl(API, SLACK_ID){
+  LoginCtrl.$inject = ["API", "SLACK_ID", "Serializer"];
+  function LoginCtrl(API, SLACK_ID, Serializer){
     var vm   = this;
 
     var data = {
@@ -16,19 +16,7 @@
       team: "T0351JZQ0"
     };
 
-    vm.slackLoginUrl = serializeObject("https://slack.com/oauth/authorize", data);
-
-    function serializeObject(url, obj){
-      for (var key in obj) {
-        if (url.indexOf("?") < 0) {
-          url += "?";
-        } else if (url !== "") {
-          url += "&";
-        }
-        url += key + "=" + encodeURIComponent(obj[key]);
-      }
-      return url;
-    }
+    vm.slackLoginUrl = Serializer.serializeObject("https://slack.com/oauth/authorize", data);
 
     return vm;
   }

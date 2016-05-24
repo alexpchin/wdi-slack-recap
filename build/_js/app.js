@@ -48459,19 +48459,10 @@ angular.module('ui.router.state')
 
   angular
     .module("slackRecap")
-    .constant("SLACK_SECRET", "85b47ace0022e2ab1fa904dfa8693106");
-
-})();
-
-(function(){
-  "use strict";
-
-  angular
-    .module("slackRecap")
     .controller("LoginController", LoginCtrl);
 
-  LoginCtrl.$inject = ["API", "SLACK_ID"];
-  function LoginCtrl(API, SLACK_ID){
+  LoginCtrl.$inject = ["API", "SLACK_ID", "Serializer"];
+  function LoginCtrl(API, SLACK_ID, Serializer){
     var vm   = this;
 
     var data = {
@@ -48481,19 +48472,7 @@ angular.module('ui.router.state')
       team: "T0351JZQ0"
     };
 
-    vm.slackLoginUrl = serializeObject("https://slack.com/oauth/authorize", data);
-
-    function serializeObject(url, obj){
-      for (var key in obj) {
-        if (url.indexOf("?") < 0) {
-          url += "?";
-        } else if (url !== "") {
-          url += "&";
-        }
-        url += key + "=" + encodeURIComponent(obj[key]);
-      }
-      return url;
-    }
+    vm.slackLoginUrl = Serializer.serializeObject("https://slack.com/oauth/authorize", data);
 
     return vm;
   }
@@ -48507,32 +48486,60 @@ angular.module('ui.router.state')
   angular
     .module("slackRecap")
     .controller("SlackController", SlackCtrl);
-
-  SlackCtrl.$inject = ["$stateParams", "$location", "$http", "SLACK_ID", "SLACK_SECRET", "API", "SLACK_CHANNEL"];
-  function SlackCtrl($stateParams, $location, $http, SLACK_ID, SLACK_SECRET, API, SLACK_CHANNEL){
+  
+  SlackCtrl.$inject = [
+    "$stateParams", 
+    "$location", 
+    "API", 
+    "TokenService", 
+    "Slack"
+  ];
+  
+  function SlackCtrl($stateParams, $location, API, TokenService, Slack){
     var vm   = this;
     vm.name  = "Home";
 
-    if ($location.search().code) {
-      var data = $stateParams;
-      data.client_id     =  SLACK_ID;
-      data.client_secret = SLACK_SECRET;
-      data.code          = $location.search().code;
-      data.redirect_uri  = API + "/";
-      oauthAccess(serializeObject("http://slack.com/api/oauth.access", data));
-    }
+    if ($location.search().code) Slack.handshake($location.search().code);
+    if (TokenService.getToken()) Slack.getGroupHistory();
 
-    function oauthAccess(url){
+    return vm;
+  }
+
+})();
+
+(function(){
+  "use strict";
+
+  angular
+    .module("slackRecap")
+    .factory("Slack", Slack);
+
+  Slack.$inject = [
+    "$http", 
+    "TokenService", 
+    "Serializer", 
+    "SLACK_CHANNEL",
+    "API"
+  ];
+
+  function Slack($http, TokenService, Serializer, SLACK_CHANNEL, API){
+    this.handshake       = handshake;
+    this.getGroupHistory = getGroupHistory;
+
+    function handshake(code){
       $http({
-        method: "GET",
-        url: url
+        method: "POST",
+        url: API + "/handshake",
+        data: {
+          code: code
+        }
       }).then(function(response){
-        console.log("oauthAccess", response);
-        getGroupHistory(response.data.access_token);
+        TokenService.setToken(response.data.access_token);
       });
     }
 
-    function getGroupHistory(token){
+    function getGroupHistory(){
+      var token = TokenService.getToken();
       var data = {
         token: token,
         channel: SLACK_CHANNEL,
@@ -48540,14 +48547,27 @@ angular.module('ui.router.state')
         count: 1000
       };
 
-      $http({
+      return $http({
         method: "GET",
-        url: serializeObject("https://slack.com/api/groups.history", data)
+        url: Serializer.serializeObject("https://slack.com/api/groups.history", data)
       }).then(function(response){
         console.log(response);
       });
     }
 
+    return this;
+  }
+
+})();
+(function(){
+  "use strict";
+
+  angular
+    .module("slackRecap")
+    .service("Serializer", Serializer);
+
+  function Serializer(){
+    this.serializeObject = serializeObject;
     function serializeObject(url, obj){
       for (var key in obj) {
         if (url.indexOf("?") < 0) {
@@ -48559,8 +48579,35 @@ angular.module('ui.router.state')
       }
       return url;
     }
+  }
 
-    return vm;
+})();
+(function(){
+  "use strict";
+
+  angular
+    .module("slackRecap")
+    .service("TokenService", TokenService);
+
+  TokenService.$inject = ["$window"];
+  function TokenService($window){
+    var self = this;
+
+    self.setToken = setToken;
+    self.getToken = getToken;
+    self.removeToken = removeToken;
+
+    function setToken(token){
+      return $window.localStorage.setItem("oauth-token", token);
+    }
+
+    function getToken(){
+      return $window.localStorage.getItem("oauth-token");
+    }
+
+    function removeToken(){
+      return $window.localStorage.removeItem("oauth-token");
+    }
   }
 
 })();
