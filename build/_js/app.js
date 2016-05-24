@@ -48432,7 +48432,7 @@ angular.module('ui.router.state')
 
   angular
     .module("slackRecap")
-    .controller("LoginController", SlackCtrl);
+    .controller("LoginController", LoginCtrl);
 
   function SlackCtrl(){
     var vm  = this;

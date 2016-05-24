@@ -29,11 +29,11 @@ module.exports = function(grunt) {
     sass: {
       expanded: {
         options: { outputStyle: 'expanded' },
-        files: { 'build/css/app.css': 'src/scss/style.scss' }
+        files: { 'build/_css/app.css': 'src/scss/style.scss' }
       },
       compressed: {
         options: { outputStyle: 'compressed' },
-        files: { 'build/css/app.min.css': 'src/scss/style.scss' }
+        files: { 'build/_css/app.min.css': 'src/scss/style.scss' }
       }
     },
     concat: {
@@ -43,11 +43,11 @@ module.exports = function(grunt) {
           'src/js/app.js',
           'src/js/**/*.js'
         ],
-        dest: 'build/js/app.js'
+        dest: 'build/_js/app.js'
       }
     },
     uglify: {
-      'build/js/app.min.js': 'build/js/app.js'
+      'build/_js/app.min.js': 'build/_js/app.js'
     },
     watch: {
       configFiles: {
