@@ -48472,11 +48472,10 @@ angular.module('ui.router.state')
       team: "T0351JZQ0"
     };
 
-    vm.slackLoginUrl = Serializer.serializeObject("https://slack.com/oauth/authorize", data);
+    vm.slackLoginUrl = Serializer.serialize("https://slack.com/oauth/authorize", data);
 
     return vm;
   }
-
 
 })();
 
@@ -48538,20 +48537,25 @@ angular.module('ui.router.state')
       });
     }
 
-    function getGroupHistory(){
+    function getGroupHistory(timestamp){
       var token = TokenService.getToken();
       var data = {
         token: token,
         channel: SLACK_CHANNEL,
         pretty: 1,
-        count: 1000
+        count: 1000,
+        latest: timestamp || ""
       };
 
       return $http({
         method: "GET",
-        url: Serializer.serializeObject("https://slack.com/api/groups.history", data)
+        url: Serializer.serialize("https://slack.com/api/groups.history", data)
       }).then(function(response){
-        console.log(response);
+        if (response.data.has_more === true) {
+          var messages = response.data.messages;
+          var timestamp = messages[messages.length-1].ts;
+          return getGroupHistory(timestamp);
+        } 
       });
     }
 
@@ -48567,8 +48571,7 @@ angular.module('ui.router.state')
     .service("Serializer", Serializer);
 
   function Serializer(){
-    this.serializeObject = serializeObject;
-    function serializeObject(url, obj){
+    this.serialize = function(url, obj){
       for (var key in obj) {
         if (url.indexOf("?") < 0) {
           url += "?";
@@ -48578,7 +48581,7 @@ angular.module('ui.router.state')
         url += key + "=" + encodeURIComponent(obj[key]);
       }
       return url;
-    }
+    };
   }
 
 })();

@@ -6,8 +6,7 @@
     .service("Serializer", Serializer);
 
   function Serializer(){
-    this.serializeObject = serializeObject;
-    function serializeObject(url, obj){
+    this.serialize = function(url, obj){
       for (var key in obj) {
         if (url.indexOf("?") < 0) {
           url += "?";
@@ -17,7 +16,7 @@
         url += key + "=" + encodeURIComponent(obj[key]);
       }
       return url;
-    }
+    };
   }
 
 })();

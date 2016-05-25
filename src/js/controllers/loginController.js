@@ -16,7 +16,7 @@
       team: "T0351JZQ0"
     };
 
-    vm.slackLoginUrl = Serializer.serializeObject("https://slack.com/oauth/authorize", data);
+    vm.slackLoginUrl = Serializer.serialize("https://slack.com/oauth/authorize", data);
 
     return vm;
   }

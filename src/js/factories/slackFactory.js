@@ -29,20 +29,25 @@
       });
     }
 
-    function getGroupHistory(){
+    function getGroupHistory(timestamp){
       var token = TokenService.getToken();
       var data = {
         token: token,
         channel: SLACK_CHANNEL,
         pretty: 1,
-        count: 1000
+        count: 1000,
+        latest: timestamp || ""
       };
 
       return $http({
         method: "GET",
-        url: Serializer.serializeObject("https://slack.com/api/groups.history", data)
+        url: Serializer.serialize("https://slack.com/api/groups.history", data)
       }).then(function(response){
-        console.log(response);
+        if (response.data.has_more === true) {
+          var messages = response.data.messages;
+          var timestamp = messages[messages.length-1].ts;
+          return getGroupHistory(timestamp);
+        } 
       });
     }
 
