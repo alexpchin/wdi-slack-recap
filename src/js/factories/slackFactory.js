@@ -39,7 +39,7 @@
         channel: SLACK_CHANNEL,
         pretty: 1,
         count: 1000,
-        latest: timestamp
+        latest: timestamp || ""
       };
 
       return $http({
@@ -49,8 +49,11 @@
         var messages = response.data.messages;
         self.messages.push.apply(self.messages, messages);
         var timestamp = messages[messages.length-1].ts;
+
         if (response.data.has_more === true) return getGroupHistory(timestamp, cb);
         return cb(self.messages);
+      }, function(err){
+        console.log(err);
       });
     }
 
