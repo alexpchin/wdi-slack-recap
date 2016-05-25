@@ -1,3 +1,8 @@
 <h2>{{ slack.name }}</h2>
-
-{{ slack.messages }}
+<h3>Messages: {{ slack.messageCount }}</h3>
+<h3>Gifs: {{ slack.gifs.length }}</h3>
+<ul>
+  <li data-ng-repeat="message in slack.gifs">
+    <img data-ng-src="{{ message.attachments[0].image_url }}">
+  </li>
+</ul>

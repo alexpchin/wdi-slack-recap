@@ -19,10 +19,27 @@
 
     if ($location.search().code) Slack.handshake($location.search().code);
     if (TokenService.getToken()) {
-      Slack.getGroupHistory(null, function(data){
-        vm.messages = data;
+      Slack.getGroupHistory(null, processData);
+    }
+
+    function processData(data) {
+      vm.messages = data;
+      vm.messageCount = data.length;
+      vm.gifs = filterGifs();
+    }
+
+    function filterGifs() {
+      return vm.messages.filter(function(message) {
+        if (!message.attachments) return;
+        for (var i = 0; i < message.attachments.length; i++) {
+          var attachment = message.attachments[i];
+          if (attachment.image_url && attachment.image_url.indexOf("gif") > -1) {
+            return true;
+          }  
+        }
       });
     }
+
     return vm;
   }
 
