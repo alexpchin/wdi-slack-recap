@@ -14,8 +14,11 @@
   ];
 
   function Slack($http, TokenService, Serializer, SLACK_CHANNEL, API){
-    this.handshake       = handshake;
-    this.getGroupHistory = getGroupHistory;
+    var self             = this;
+
+    self.handshake       = handshake;
+    self.getGroupHistory = getGroupHistory;
+    self.messages        = [];
 
     function handshake(code){
       $http({
@@ -29,25 +32,25 @@
       });
     }
 
-    function getGroupHistory(timestamp){
+    function getGroupHistory(timestamp, cb){
       var token = TokenService.getToken();
       var data = {
         token: token,
         channel: SLACK_CHANNEL,
         pretty: 1,
         count: 1000,
-        latest: timestamp || ""
+        latest: timestamp
       };
 
       return $http({
         method: "GET",
         url: Serializer.serialize("https://slack.com/api/groups.history", data)
       }).then(function(response){
-        if (response.data.has_more === true) {
-          var messages = response.data.messages;
-          var timestamp = messages[messages.length-1].ts;
-          return getGroupHistory(timestamp);
-        } 
+        var messages = response.data.messages;
+        self.messages.push.apply(self.messages, messages);
+        var timestamp = messages[messages.length-1].ts;
+        if (response.data.has_more === true) return getGroupHistory(timestamp, cb);
+        return cb(self.messages);
       });
     }
 
