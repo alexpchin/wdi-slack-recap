@@ -17,7 +17,7 @@
     var self             = this;
 
     self.handshake       = handshake;
-    self.getGroupHistory = getGroupHistory;
+    self.archiveChannel  = archiveChannel;
     self.messages        = [];
 
     function handshake(code){
@@ -32,28 +32,18 @@
       });
     }
 
-    function getGroupHistory(timestamp, cb){
+    function archiveChannel(cb) {
       var token = TokenService.getToken();
-      var data = {
-        token: token,
-        channel: SLACK_CHANNEL,
-        pretty: 1,
-        count: 1000,
-        latest: timestamp || ""
-      };
-
-      return $http({
-        method: "GET",
-        url: Serializer.serialize("https://slack.com/api/groups.history", data)
+      $http({
+        method: "POST",
+        url: API + "/messages",
+        data: {
+          access_token: token,
+          slack_channel: SLACK_CHANNEL
+        }
       }).then(function(response){
-        var messages = response.data.messages;
-        self.messages.push.apply(self.messages, messages);
-        var timestamp = messages[messages.length-1].ts;
-
-        if (response.data.has_more === true) return getGroupHistory(timestamp, cb);
-        return cb(self.messages);
-      }, function(err){
-        console.log(err);
+        console.log(response);
+        cb(response);
       });
     }
 

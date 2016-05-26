@@ -1,6 +1,7 @@
 var express     = require("express");
 var rp          = require("request-promise");
 var bodyParser  = require("body-parser");
+// var Message     = require("message");
 var app         = express();
 
 var config      = require("./config/config");
@@ -18,13 +19,24 @@ app.post("/handshake", function(req, res){
 
   rp(serializeObject("http://slack.com/api/oauth.access", data))
     .then(function(response) {
-      console.log(response);
       res.json(JSON.parse(response));
     })
     .catch(function (err) {
       res.json({message: "Something went wrong."}); 
     });
-})
+});
+
+app.post("/messages", function(req, res){
+  var token    = req.body.access_token;
+  var channel  = req.body.slack_channel;
+  var messages = [];
+
+  messageRequest(messages, "", token, channel, function(messages) {
+    // Message.create(messages).then(function(messages){
+    console.log(messages);
+      // res.json(messages);
+  });
+});
 
 app.get("/*", function(req, res){
   res.sendFile(__dirname + "/build/index.html");
@@ -45,4 +57,29 @@ function serializeObject(url, obj){
     url += key + "=" + encodeURIComponent(obj[key]);
   }
   return url;
+}
+
+function messageRequest(messages, timestamp, token, channel, cb) {
+  var data = {
+    token: token,
+    channel: channel,
+    pretty: 1,
+    count: 1000,
+    latest: timestamp || ""
+  };
+
+  rp(serializeObject("https://slack.com/api/groups.history", data))
+    .then(function(response){
+      console.log(response);
+      var msgs = response;
+      messages.push.apply(messages, msgs);
+      var timestamp = msgs[msgs.length-1].ts;
+
+      if (response.data.has_more === true) {
+        return messageRequest(messages, timestamp, token, channel, cb);
+      } 
+      return cb(messages);
+    }).catch(function(err){
+      console.log(err);
+    });
 }

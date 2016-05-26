@@ -48500,13 +48500,15 @@ angular.module('ui.router.state')
 
     if ($location.search().code) Slack.handshake($location.search().code);
     if (TokenService.getToken()) {
-      Slack.getGroupHistory(null, processData);
+      Slack.archiveChannel(processData);
     }
 
     function processData(data) {
-      vm.messages = data;
-      vm.messageCount = data.length;
-      vm.gifs = filterGifs();
+      console.log("yo");
+      // vm.messages = data;
+      // vm.messageCount = data.length;
+      // vm.gifs = filterGifs();
+      // vm.pugs = filterPugs();
     }
 
     function filterGifs() {
@@ -48517,6 +48519,16 @@ angular.module('ui.router.state')
           if (attachment.image_url && attachment.image_url.indexOf("gif") > -1) {
             return true;
           }  
+        }
+      });
+    }
+
+    function filterPugs() {
+      return vm.messages.filter(function(message) {
+        if (!message.reactions) return;
+        for (var i = 0; i < message.reactions.length; i++) {
+          var reaction = message.reactions[i];
+          if (message.reactions[i] === "pug") return true;
         }
       });
     }
@@ -48545,7 +48557,7 @@ angular.module('ui.router.state')
     var self             = this;
 
     self.handshake       = handshake;
-    self.getGroupHistory = getGroupHistory;
+    self.archiveChannel  = archiveChannel;
     self.messages        = [];
 
     function handshake(code){
@@ -48560,28 +48572,18 @@ angular.module('ui.router.state')
       });
     }
 
-    function getGroupHistory(timestamp, cb){
+    function archiveChannel(cb) {
       var token = TokenService.getToken();
-      var data = {
-        token: token,
-        channel: SLACK_CHANNEL,
-        pretty: 1,
-        count: 1000,
-        latest: timestamp || ""
-      };
-
-      return $http({
-        method: "GET",
-        url: Serializer.serialize("https://slack.com/api/groups.history", data)
+      $http({
+        method: "POST",
+        url: API + "/messages",
+        data: {
+          access_token: token,
+          slack_channel: SLACK_CHANNEL
+        }
       }).then(function(response){
-        var messages = response.data.messages;
-        self.messages.push.apply(self.messages, messages);
-        var timestamp = messages[messages.length-1].ts;
-
-        if (response.data.has_more === true) return getGroupHistory(timestamp, cb);
-        return cb(self.messages);
-      }, function(err){
-        console.log(err);
+        console.log(response);
+        cb(response);
       });
     }
 

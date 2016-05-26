@@ -19,13 +19,15 @@
 
     if ($location.search().code) Slack.handshake($location.search().code);
     if (TokenService.getToken()) {
-      Slack.getGroupHistory(null, processData);
+      Slack.archiveChannel(processData);
     }
 
     function processData(data) {
-      vm.messages = data;
-      vm.messageCount = data.length;
-      vm.gifs = filterGifs();
+      console.log("yo");
+      // vm.messages = data;
+      // vm.messageCount = data.length;
+      // vm.gifs = filterGifs();
+      // vm.pugs = filterPugs();
     }
 
     function filterGifs() {
@@ -36,6 +38,16 @@
           if (attachment.image_url && attachment.image_url.indexOf("gif") > -1) {
             return true;
           }  
+        }
+      });
+    }
+
+    function filterPugs() {
+      return vm.messages.filter(function(message) {
+        if (!message.reactions) return;
+        for (var i = 0; i < message.reactions.length; i++) {
+          var reaction = message.reactions[i];
+          if (message.reactions[i] === "pug") return true;
         }
       });
     }
